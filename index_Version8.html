@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>U Crypto Position Size Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary: #3900ff;
+      --u: #ffb600;
+      --bg: #f6f7fb;
+      --card-bg: #fff;
+      --text-dark: #222;
+      --text-light: #888;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --footer-bg: #fff;
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: var(--text-dark);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-top: 5vh;
+      padding: 2.5rem 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 0.2em;
+      color: var(--u);
+      letter-spacing: -1px;
+    }
+    .u-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #ffb600 60%, #3900ff 100%);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.3em 1em;
+      font-size: 1em;
+      margin-bottom: 0.9em;
+      margin-top: 0.2em;
+      letter-spacing: 0.5px;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 0.3em;
+      color: var(--text-light);
+      font-size: 0.97em;
+      margin-top: 1em;
+    }
+    select, input {
+      width: 100%;
+      padding: 0.9em;
+      margin-bottom: 0.1em;
+      border-radius: var(--radius);
+      border: 1px solid #e3e6ec;
+      box-sizing: border-box;
+      font-size: 1.05em;
+      background: var(--bg);
+      outline: none;
+      transition: border 0.18s;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+    .price-info {
+      color: var(--primary);
+      font-size: 0.97em;
+      margin-top: 0.2em;
+      margin-bottom: 0.5em;
+      min-height: 1.1em;
+    }
+    .result {
+      margin-top: 1.5em;
+      background: #eafff6;
+      border-radius: var(--radius);
+      padding: 1em 1.3em;
+      color: var(--primary);
+      font-size: 1.18em;
+      box-shadow: 0 2px 8px rgba(57,0,255,0.08);
+      min-height: 3em;
+    }
+    .error {
+      color: #e23c3c;
+      background: #fff1f1;
+    }
+    .referral-section {
+      margin-top: 2.7em;
+      margin-bottom: 1.5em;
+    }
+    .referral-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 1em 2.2em;
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(57,0,255,0.09);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.18s, transform 0.1s;
+    }
+    .referral-btn:hover {
+      background: #2c008c;
+      transform: scale(0.98);
+    }
+    .referral-desc {
+      font-size: 0.98em;
+      color: var(--text-light);
+      margin-top: 1em;
+      margin-bottom: 0.4em;
+    }
+    .footer {
+      width: 100vw;
+      background: var(--footer-bg);
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      padding: 0.7em 0.5em 1.7em 0.5em;
+      z-index: 99;
+      border-top: 1px solid #e3e6ec;
+    }
+    .ticker-label {
+      font-size: 1.03em;
+      font-weight: 700;
+      color: var(--primary);
+      margin-right: 1em;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      width: calc(100vw - 150px);
+      vertical-align: middle;
+      position: relative;
+      top: 2px;
+    }
+    .ticker-inner {
+      display: inline-block;
+      white-space: nowrap;
+      will-change: transform;
+      animation: tickerScroll 22s linear infinite;
+      font-size: 1.01em;
+      min-width: 100vw;
+    }
+    @keyframes tickerScroll {
+      0% { transform: translateX(0);}
+      100% { transform: translateX(-70%);}
+    }
+    .ticker-item {
+      display: inline-block;
+      margin-right: 2.2em;
+    }
+    .ticker-price {
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .ticker-change {
+      font-weight: bold;
+      margin-left: 0.4em;
+    }
+    .ticker-change.up {
+      color: #00b74a;
+    }
+    .ticker-change.down {
+      color: #ef3340;
+    }
+    .footer-powered {
+      margin-top: 1.1em;
+      font-size: 0.93em;
+      color: var(--text-light);
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem 0.5rem;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      .footer {
+        font-size: 0.97em;
+      }
+      .ticker-label {
+        font-size: 0.95em;
+      }
+      .ticker {
+        width: 92vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Crypto Position Size Calculator</h1>
+    <div class="u-badge">The latest Next Generation is U itself</div>
+    <form id="calcForm" autocomplete="off">
+      <label for="coin">Choose Coin</label>
+      <select id="coin" required>
+        <option value="bitcoin">Bitcoin (BTC)</option>
+        <option value="ethereum">Ethereum (ETH)</option>
+        <option value="solana">Solana (SOL)</option>
+        <option value="dogecoin">Dogecoin (DOGE)</option>
+        <option value="cardano">Cardano (ADA)</option>
+        <option value="ripple">Ripple (XRP)</option>
+      </select>
+      <div class="price-info" id="priceInfo"></div>
+
+      <label for="balance">Account Balance ($)</label>
+      <input type="number" id="balance" min="0" step="any">
+
+      <label for="risk">Risk per Trade (%)</label>
+      <input type="number" id="risk" min="0" step="any">
+
+      <label for="entry">Entry Price ($)</label>
+      <input type="number" id="entry" min="0" step="any">
+
+      <label for="stop">Stop Loss Price ($)</label>
+      <input type="number" id="stop" min="0" step="any">
+    </form>
+    <div class="result" id="result"></div>
+    <div class="referral-section">
+      <a href="https://www.binance.com/en/register?ref=YOUR_REFERRAL_CODE" class="referral-btn" target="_blank" rel="noopener">Best Crypto Exchange</a>
+      <div class="referral-desc">
+        <strong>Binance</strong> is trusted by millions globally.<br>
+        Register now for the best rates, security, and features. Your gateway to the world of crypto.
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span class="ticker-label">Top Gainer Coins:</span>
+    <span class="ticker"><span class="ticker-inner" id="tickerInner">Loading...</span></span>
+    <div class="footer-powered">
+      Powered by Copilot &mdash; Live prices & coins from <a href="https://coingecko.com" target="_blank">CoinGecko</a>
+    </div>
+  </div>
+  <script>
+    const coinSelect = document.getElementById('coin');
+    const priceInfo = document.getElementById('priceInfo');
+    const entryInput = document.getElementById('entry');
+    const stopInput = document.getElementById('stop');
+    const balanceInput = document.getElementById('balance');
+    const riskInput = document.getElementById('risk');
+    const resultDiv = document.getElementById('result');
+    const tickerInner = document.getElementById('tickerInner');
+
+    let livePrice = null;
+
+    // Fetch price from CoinGecko API and show in UI
+    async function fetchPrice(coinId) {
+      priceInfo.textContent = "Fetching price...";
+      try {
+        const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data[coinId] && data[coinId].usd) {
+          livePrice = data[coinId].usd;
+          priceInfo.textContent = `Live Price: $${livePrice}`;
+          entryInput.value = livePrice;
+          stopInput.value = (livePrice * 0.99).toFixed(2); // Example: 1% lower stop
+          calculate();
+        } else {
+          priceInfo.textContent = "Price not found.";
+          livePrice = null;
+        }
+      } catch (e) {
+        priceInfo.textContent = "Error fetching price.";
+        livePrice = null;
+      }
+    }
+
+    // Calculate position size live
+    function calculate() {
+      const balance = parseFloat(balanceInput.value);
+      const riskPct = parseFloat(riskInput.value);
+      const entry = parseFloat(entryInput.value);
+      const stop = parseFloat(stopInput.value);
+      const coin = coinSelect.options[coinSelect.selectedIndex].text;
+
+      if (
+        isNaN(balance) || balance <= 0 ||
+        isNaN(riskPct) || riskPct <= 0 ||
+        isNaN(entry) || entry <= 0 ||
+        isNaN(stop) || stop <= 0 ||
+        stop === entry
+      ) {
+        resultDiv.innerHTML = '<span class="error">Fill all fields with valid values. Entry and Stop Loss must be different.</span>';
+        return;
+      }
+      // Calculate risk amount and position size
+      const riskAmount = balance * (riskPct / 100);
+      const positionSize = riskAmount / Math.abs(entry - stop);
+      const positionSizeUSD = positionSize * entry;
+
+      resultDiv.innerHTML =
+        `<strong>Coin:</strong> ${coin}<br>` +
+        `<strong>Position Size:</strong> ${positionSize.toFixed(4)} coins<br>` +
+        `<strong>Position Size (USD):</strong> $${positionSizeUSD.toFixed(2)}<br>` +
+        `<strong>Risk Amount:</strong> $${riskAmount.toFixed(2)}`;
+    }
+
+    // On coin change, fetch price
+    coinSelect.addEventListener('change', () => {
+      fetchPrice(coinSelect.value);
+    });
+
+    // Initial price fetch
+    fetchPrice(coinSelect.value);
+
+    // Recalculate when any input changes
+    [balanceInput, riskInput, entryInput, stopInput].forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+
+    // --- Footer: Top Gainer Coins Ticker ---
+    async function fetchTopGainers() {
+      try {
+        // Get top 10 coins by 24h change (market cap rank < 100, sorted by % change)
+        const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h";
+        const res = await fetch(url);
+        const data = await res.json();
+        // Filter top gainers
+        let coins = data.filter(c => c.price_change_percentage_24h && c.price_change_percentage_24h > 0);
+        coins = coins.sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 10);
+        if (coins.length === 0) {
+          tickerInner.textContent = "No top gainers found.";
+          return;
+        }
+        tickerInner.innerHTML = coins.map(coin =>
+          `<span class="ticker-item">
+             <img src="${coin.image}" alt="${coin.symbol}" style="width:18px;vertical-align:middle;margin-right:4px;border-radius:5px;">
+             <span>${coin.name} (${coin.symbol.toUpperCase()})</span>
+             <span class="ticker-price">$${coin.current_price.toLocaleString()}</span>
+             <span class="ticker-change up">+${coin.price_change_percentage_24h.toFixed(2)}%</span>
+          </span>`
+        ).join('');
+      } catch (e) {
+        tickerInner.textContent = "Error loading top gainers.";
+      }
+    }
+    fetchTopGainers();
+    // Refresh ticker every 5 minutes
+    setInterval(fetchTopGainers, 300000);
+  </script>
+</body>
+</html>
